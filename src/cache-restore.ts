@@ -8,8 +8,6 @@ import {State, Outputs} from './constants';
 import {PackageManagerInfo} from './package-managers';
 import {getCacheDirectoryPath, getPackageManagerInfo} from './cache-utils';
 
-const CACHE_RESTORED_ENV = 'SETUP_GO_CACHE_RESTORED';
-
 export const restoreCache = async (
   versionSpec: string,
   packageManager: string,
@@ -39,17 +37,6 @@ export const restoreCache = async (
 
   core.saveState(State.CachePrimaryKey, primaryKey);
 
-  // Check if cache was already restored by a previous setup-go invocation in this job
-  const alreadyRestoredKey = process.env[CACHE_RESTORED_ENV];
-  if (alreadyRestoredKey === primaryKey) {
-    core.info(
-      `Cache already restored in this job by a previous setup-go step (key: ${primaryKey}). Skipping restore.`
-    );
-    core.setOutput(Outputs.CacheHit, true);
-    core.saveState(State.CacheMatchedKey, primaryKey);
-    return;
-  }
-
   const allPathsPopulated = cachePaths.every(cachePath => {
     try {
       if (fs.existsSync(cachePath) && fs.statSync(cachePath).isDirectory()) {
@@ -68,7 +55,6 @@ export const restoreCache = async (
     );
     core.setOutput(Outputs.CacheHit, true);
     core.saveState(State.CacheMatchedKey, primaryKey);
-    core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
     return;
   }
 
@@ -82,8 +68,6 @@ export const restoreCache = async (
   }
 
   core.saveState(State.CacheMatchedKey, cacheKey);
-  // Signal to subsequent setup-go steps that cache is already restored
-  core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
   core.info(`Cache restored from key: ${cacheKey}`);
 };
 

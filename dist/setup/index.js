@@ -76805,7 +76805,6 @@ const path_1 = __importDefault(__nccwpck_require__(16928));
 const fs_1 = __importDefault(__nccwpck_require__(79896));
 const constants_1 = __nccwpck_require__(27242);
 const cache_utils_1 = __nccwpck_require__(4673);
-const CACHE_RESTORED_ENV = 'SETUP_GO_CACHE_RESTORED';
 const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awaiter(void 0, void 0, void 0, function* () {
     const packageManagerInfo = yield (0, cache_utils_1.getPackageManagerInfo)(packageManager);
     const platform = process.env.RUNNER_OS;
@@ -76822,14 +76821,6 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
     const primaryKey = `setup-go-${platform}-${arch}-${linuxVersion}go-${versionSpec}-${fileHash}`;
     core.debug(`primary key is ${primaryKey}`);
     core.saveState(constants_1.State.CachePrimaryKey, primaryKey);
-    // Check if cache was already restored by a previous setup-go invocation in this job
-    const alreadyRestoredKey = process.env[CACHE_RESTORED_ENV];
-    if (alreadyRestoredKey === primaryKey) {
-        core.info(`Cache already restored in this job by a previous setup-go step (key: ${primaryKey}). Skipping restore.`);
-        core.setOutput(constants_1.Outputs.CacheHit, true);
-        core.saveState(constants_1.State.CacheMatchedKey, primaryKey);
-        return;
-    }
     const allPathsPopulated = cachePaths.every(cachePath => {
         try {
             if (fs_1.default.existsSync(cachePath) && fs_1.default.statSync(cachePath).isDirectory()) {
@@ -76846,7 +76837,6 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
         core.info(`Cache paths already populated on disk, skipping restore to avoid overwrite errors (key: ${primaryKey}).`);
         core.setOutput(constants_1.Outputs.CacheHit, true);
         core.saveState(constants_1.State.CacheMatchedKey, primaryKey);
-        core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
         return;
     }
     const cacheKey = yield cache.restoreCache(cachePaths, primaryKey);
@@ -76857,8 +76847,6 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
         return;
     }
     core.saveState(constants_1.State.CacheMatchedKey, cacheKey);
-    // Signal to subsequent setup-go steps that cache is already restored
-    core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
     core.info(`Cache restored from key: ${cacheKey}`);
 });
 exports.restoreCache = restoreCache;
