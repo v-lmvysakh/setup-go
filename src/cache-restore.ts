@@ -54,7 +54,7 @@ export const restoreCache = async (
       `Cache paths already populated on disk, skipping restore to avoid overwrite errors (key: ${primaryKey}).`
     );
     core.setOutput(Outputs.CacheHit, true);
-    core.saveState(State.CacheMatchedKey, primaryKey);
+    // core.saveState(State.CacheMatchedKey, primaryKey);
     return;
   }
 

@@ -76836,7 +76836,7 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
     if (allPathsPopulated) {
         core.info(`Cache paths already populated on disk, skipping restore to avoid overwrite errors (key: ${primaryKey}).`);
         core.setOutput(constants_1.Outputs.CacheHit, true);
-        core.saveState(constants_1.State.CacheMatchedKey, primaryKey);
+        // core.saveState(State.CacheMatchedKey, primaryKey);
         return;
     }
     const cacheKey = yield cache.restoreCache(cachePaths, primaryKey);
