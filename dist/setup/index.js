@@ -76830,6 +76830,25 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
         core.saveState(constants_1.State.CacheMatchedKey, primaryKey);
         return;
     }
+    const allPathsPopulated = cachePaths.every(cachePath => {
+        try {
+            if (fs_1.default.existsSync(cachePath) && fs_1.default.statSync(cachePath).isDirectory()) {
+                const entries = fs_1.default.readdirSync(cachePath);
+                return entries.length > 0;
+            }
+        }
+        catch (_a) {
+            // ignore errors checking paths
+        }
+        return false;
+    });
+    if (allPathsPopulated) {
+        core.info(`Cache paths already populated on disk, skipping restore to avoid overwrite errors (key: ${primaryKey}).`);
+        core.setOutput(constants_1.Outputs.CacheHit, true);
+        core.saveState(constants_1.State.CacheMatchedKey, primaryKey);
+        core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
+        return;
+    }
     const cacheKey = yield cache.restoreCache(cachePaths, primaryKey);
     core.setOutput(constants_1.Outputs.CacheHit, Boolean(cacheKey));
     if (!cacheKey) {
