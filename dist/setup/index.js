@@ -76839,7 +76839,7 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
     }
     core.saveState(constants_1.State.CacheMatchedKey, cacheKey);
     // Signal to subsequent setup-go steps that cache is already restored
-    core.exportVariable(CACHE_RESTORED_ENV, cacheKey);
+    core.exportVariable(CACHE_RESTORED_ENV, primaryKey);
     core.info(`Cache restored from key: ${cacheKey}`);
 });
 exports.restoreCache = restoreCache;
