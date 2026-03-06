@@ -76828,7 +76828,9 @@ const restoreCache = (versionSpec, packageManager, cacheDependencyPath) => __awa
                 return entries.length > 0;
             }
         }
-        catch (_a) { }
+        catch (_a) {
+            // ignore errors checking paths
+        }
         return false;
     });
     if (allPathsPopulated) {

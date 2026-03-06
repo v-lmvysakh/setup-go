@@ -43,7 +43,9 @@ export const restoreCache = async (
         const entries = fs.readdirSync(cachePath);
         return entries.length > 0;
       }
-    } catch {}
+    } catch {
+      // ignore errors checking paths
+    }
     return false;
   });
 
