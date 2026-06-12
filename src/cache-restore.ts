@@ -37,6 +37,26 @@ export const restoreCache = async (
 
   core.saveState(State.CachePrimaryKey, primaryKey);
 
+  const allPathsPopulated = cachePaths.every(cachePath => {
+    try {
+      if (fs.existsSync(cachePath) && fs.statSync(cachePath).isDirectory()) {
+        const entries = fs.readdirSync(cachePath);
+        return entries.length > 0;
+      }
+    } catch {
+      // ignore errors checking paths
+    }
+    return false;
+  });
+
+  if (allPathsPopulated) {
+    core.info(
+      `Cache paths already populated on disk, skipping restore to avoid overwrite errors (key: ${primaryKey}).`
+    );
+    core.setOutput(Outputs.CacheHit, true);
+    return;
+  }
+
   const cacheKey = await cache.restoreCache(cachePaths, primaryKey);
   core.setOutput(Outputs.CacheHit, Boolean(cacheKey));
 
